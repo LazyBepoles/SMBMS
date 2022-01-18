@@ -1,51 +1,43 @@
 //时间
-function fn() {
+function fn(){
     var time = new Date();
-    var str = "";
+    var str= "";
     var div = document.getElementById("time");
 //    console.log(time);
     var year = time.getFullYear();
-    var mon = time.getMonth() + 1;
+    var mon = time.getMonth()+1;
     var day = time.getDate();
     var h = time.getHours();
     var m = time.getMinutes();
     var s = time.getSeconds();
     var week = time.getDay();
-    switch (week) {
-        case 0:
-            week = "Sun";
+    switch (week){
+        case 0:week="日";
             break;
-        case 1:
-            week = "Mon";
+        case 1:week="一";
             break;
-        case 2:
-            week = "Tues";
+        case 2:week="二";
             break;
-        case 3:
-            week = "Wed";
+        case 3:week="三";
             break;
-        case 4:
-            week = "Thur";
+        case 4:week="四";
             break;
-        case 5:
-            week = "Fri";
+        case 5:week="五";
             break;
-        case 6:
-            week = "Sat";
+        case 6:week="六";
             break;
     }
-    str = year + "-" + totwo(mon) + "-" + totwo(day) + "&nbsp;" + totwo(h) + ":" + totwo(m) + ":" + totwo(s) + "&nbsp;" + week;
+    str = year +"年"+totwo(mon)+"月"+totwo(day)+"日"+"&nbsp;"+totwo(h)+":"+totwo(m)+":"+totwo(s)+"&nbsp;"+"星期"+week;
     div.innerHTML = str;
 }
-
 fn();
-setInterval(fn, 1000);
-
-function totwo(n) {
-    if (n <= 9) {
-        return n = "0" + n;
-    } else {
-        return n = "" + n;
+setInterval(fn,1000);
+function totwo(n){
+    if(n<=9){
+        return n = "0"+n;
+    }
+    else{
+        return n =""+n;
     }
 }
 
