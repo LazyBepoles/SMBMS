@@ -123,20 +123,37 @@ public class UserServiceImpl implements UserService {
     }
 
     //查看用户
-
-    public User getUserById(String id) {
+    public User getUserById(int id) {
         Connection connection = null;
         User user = null;
 
         connection = BaseDao.getConnection();
         //通过业务层调用对应的具体的数据库操作
         try {
-            user = userDao.getLoginUser(connection, id);
+            user = userDao.getUserById(connection, id);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             BaseDao.closeResource(connection, null, null);
         }
         return user;
+    }
+
+    //删除用户
+    public boolean delUserBy(int id) {
+        Connection connection = null;
+        boolean flag = false;
+        //删除用户
+        try {
+            connection = BaseDao.getConnection();
+            if (userDao.delUser(connection, id) > 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection, null, null);
+        }
+        return flag;
     }
 }

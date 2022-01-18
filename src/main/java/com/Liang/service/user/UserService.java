@@ -25,5 +25,8 @@ public interface UserService {
     public boolean addUser(User user);
 
     //查看用户
-    public User getUserById(String id);
+    public User getUserById(int id);
+
+    //删除用户
+    public boolean delUserBy(int id);
 }

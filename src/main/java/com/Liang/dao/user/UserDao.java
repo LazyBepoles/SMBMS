@@ -24,5 +24,8 @@ public interface UserDao {
     public int addUser(Connection connection,User user) throws Exception;
 
     //查看用户
-    public User getUserById(Connection connection,String id) throws Exception;
+    public User getUserById(Connection connection,int id) throws Exception;
+
+    //删除用户
+    public int delUser(Connection connection,int id) throws Exception;
 }

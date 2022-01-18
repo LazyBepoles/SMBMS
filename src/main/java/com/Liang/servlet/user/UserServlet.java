@@ -40,8 +40,10 @@ public class UserServlet extends HttpServlet {
       this.getRoleList(req, resp);
     } else if (method.equals("add") && !StringUtils.isNullOrEmpty(method)) {
       this.add(req, resp);
-    }else if(method.equals("view") && !StringUtils.isNullOrEmpty(method)){
+    } else if (method.equals("view") && !StringUtils.isNullOrEmpty(method)) {
       this.getUserById(req, resp);
+    } else if (method.equals("deluser") && !StringUtils.isNullOrEmpty(method)) {
+      this.delUser(req, resp);
     }
   }
 
@@ -225,8 +227,9 @@ public class UserServlet extends HttpServlet {
     }
   }
 
-  //添加用户
-  public void add(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+  // 添加用户
+  public void add(HttpServletRequest req, HttpServletResponse resp)
+      throws IOException, ServletException {
     String userCode = req.getParameter("userCode");
     String userName = req.getParameter("userName");
     String userPassword = req.getParameter("userPassword");
@@ -250,28 +253,62 @@ public class UserServlet extends HttpServlet {
     user.setPhone(phone);
     user.setUserRole(Integer.valueOf(userRole));
     user.setCreationDate(new Date());
-    user.setCreatedBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+    user.setCreatedBy(((User) req.getSession().getAttribute(Constants.USER_SESSION)).getId());
 
     UserService userService = new UserServiceImpl();
-    if(userService.addUser(user)){
-      resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
-    }else{
+    if (userService.addUser(user)) {
+      resp.sendRedirect(req.getContextPath() + "/jsp/user.do?method=query");
+    } else {
       req.getRequestDispatcher("useradd.jsp").forward(req, resp);
     }
   }
 
-  //查看
-  public void getUserById(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  // 查看
+  public void getUserById(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
     String id = req.getParameter("uid");
-    if(!StringUtils.isNullOrEmpty(id)){
-      //调用后台方法得到user对象
+    Integer serId = 0;
+    try{
+      serId = Integer.parseInt(id);
+    }catch (Exception e) {
+      serId = 0;
+    }
+    if (serId > 0) {
+      // 调用后台方法得到user对象
       UserService userService = new UserServiceImpl();
-      User user = userService.getUserById(id);
+      User user = userService.getUserById(serId);
       req.setAttribute("user", user);
       req.getRequestDispatcher("userview.jsp").forward(req, resp);
+      System.out.println(user);
     }
   }
-  //修改
+  // 修改
 
-  //删除
+  // 删除
+  public void delUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    String id = req.getParameter("uid");
+    Integer delId = 0;
+    try{
+      delId = Integer.parseInt(id);
+    }catch (Exception e) {
+      delId = 0;
+    }
+    HashMap<String, String> resultMap = new HashMap<String, String>();
+    if(delId <= 0){
+      resultMap.put("delResult", "notexist");
+    }else{
+      UserService userService = new UserServiceImpl();
+      if(userService.delUserBy(delId)){
+        resultMap.put("delResult", "true");
+      }else{
+        resultMap.put("delResult", "false");
+      }
+    }
+    //把resultMap转换成json对象输出
+    resp.setContentType("application/json");
+    PrintWriter outPrintWriter = resp.getWriter();
+    outPrintWriter.write(JSONArray.toJSONString(resultMap));
+    outPrintWriter.flush();
+    outPrintWriter.close();
+  }
 }

@@ -151,13 +151,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     //查看用户
-    public User getUserById(Connection connection, String id) throws Exception {
+    public User getUserById(Connection connection, int id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         User user = null;
 
         if (connection != null) {
-            String sql = "select * from smbms_user where id = ?";
+            String sql = "select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r where u.userRole = r.id and u.id = ?";
             Object[] params = {id};
 
             rs = BaseDao.execute(connection, ps, rs, sql, params);
@@ -177,9 +177,23 @@ public class UserDaoImpl implements UserDao {
                 user.setCreationDate(rs.getTimestamp("creationDate"));
                 user.setModifyBy(rs.getInt("modifyBy"));
                 user.setModifyDate(rs.getTimestamp("modifyDate"));
+                user.setUserRoleName(rs.getString("roleName"));
             }
             BaseDao.closeResource(null, ps, rs);
         }
         return user;
+    }
+
+    //删除用户
+    public int delUser(Connection connection, int id) throws Exception {
+        PreparedStatement ps = null;
+        int execute = 0;
+        if (connection != null) {
+            String sql = "delete from smbms_user where id = ?";
+            Object[] params = {id};
+            execute = BaseDao.execute(connection, ps, sql, params);
+            BaseDao.closeResource(null, ps, null);
+        }
+        return execute;
     }
 }
