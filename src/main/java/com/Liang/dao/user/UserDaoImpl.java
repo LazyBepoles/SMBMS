@@ -177,7 +177,7 @@ public class UserDaoImpl implements UserDao {
                 user.setCreationDate(rs.getTimestamp("creationDate"));
                 user.setModifyBy(rs.getInt("modifyBy"));
                 user.setModifyDate(rs.getTimestamp("modifyDate"));
-                user.setUserRoleName(rs.getString("roleName"));
+                user.setUserRoleName(rs.getString("userRoleName"));
             }
             BaseDao.closeResource(null, ps, rs);
         }
