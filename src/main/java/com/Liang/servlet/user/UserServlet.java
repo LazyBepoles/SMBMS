@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,14 @@ public class UserServlet extends HttpServlet {
       this.pwdModify(req, resp);
     } else if (method.equals("query") && !StringUtils.isNullOrEmpty(method)) {
       this.query(req, resp);
+    } else if (method.equals("ucexist") && !StringUtils.isNullOrEmpty(method)) {
+      this.userCodeExist(req, resp);
+    } else if (method.equals("getrolelist") && !StringUtils.isNullOrEmpty(method)) {
+      this.getRoleList(req, resp);
+    } else if (method.equals("add") && !StringUtils.isNullOrEmpty(method)) {
+      this.add(req, resp);
+    }else if(method.equals("view") && !StringUtils.isNullOrEmpty(method)){
+      this.getUserById(req, resp);
     }
   }
 
@@ -88,7 +98,6 @@ public class UserServlet extends HttpServlet {
         resultMap.put("result", "false");
       }
     }
-
     // 将Map转化为json
     try {
       resp.setContentType("application/json");
@@ -146,7 +155,8 @@ public class UserServlet extends HttpServlet {
     }
 
     // 获取用户列表
-    List<User> userList = userService.getUserList(queryUserName, queryUserRole, currentPageNo, pageSize);
+    List<User> userList =
+        userService.getUserList(queryUserName, queryUserRole, currentPageNo, pageSize);
     req.setAttribute("userList", userList);
 
     // 获取角色列表
@@ -170,4 +180,98 @@ public class UserServlet extends HttpServlet {
       e.printStackTrace();
     }
   }
+
+  // 判断账号是否存在
+  public void userCodeExist(HttpServletRequest req, HttpServletResponse resp) {
+    String userCode = req.getParameter("userCode");
+    // 使用Map存结果集
+    Map<String, String> resultMap = new HashMap<String, String>();
+    // 验证数据库中是否有该账户
+    if (StringUtils.isNullOrEmpty(userCode)) {
+      resultMap.put("userCode", "exist");
+    } else {
+      UserService userService = new UserServiceImpl();
+      User user = userService.userCodeExist(userCode);
+      if (user != null) {
+        resultMap.put("userCode", "exist");
+      } else {
+        resultMap.put("userCode", "notexist");
+      }
+    }
+    // 将Map转化为json
+    try {
+      resp.setContentType("application/json");
+      PrintWriter writer = resp.getWriter();
+      writer.write(JSONArray.toJSONString(resultMap));
+      writer.flush();
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  // 获取角色列表
+  public void getRoleList(HttpServletRequest req, HttpServletResponse resp) {
+    RoleService roleService = new RoleServiceImpl();
+    List<Role> roleList = roleService.getRoleList();
+    try {
+      resp.setContentType("application/json");
+      PrintWriter writer = resp.getWriter();
+      writer.write(JSONArray.toJSONString(roleList));
+      writer.flush();
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  //添加用户
+  public void add(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    String userCode = req.getParameter("userCode");
+    String userName = req.getParameter("userName");
+    String userPassword = req.getParameter("userPassword");
+    String gender = req.getParameter("gender");
+    String birthday = req.getParameter("birthday");
+    String phone = req.getParameter("phone");
+    String address = req.getParameter("address");
+    String userRole = req.getParameter("userRole");
+
+    User user = new User();
+    user.setUserCode(userCode);
+    user.setUserName(userName);
+    user.setUserPassword(userPassword);
+    user.setAddress(address);
+    try {
+      user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(birthday));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    user.setGender(Integer.valueOf(gender));
+    user.setPhone(phone);
+    user.setUserRole(Integer.valueOf(userRole));
+    user.setCreationDate(new Date());
+    user.setCreatedBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+
+    UserService userService = new UserServiceImpl();
+    if(userService.addUser(user)){
+      resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
+    }else{
+      req.getRequestDispatcher("useradd.jsp").forward(req, resp);
+    }
+  }
+
+  //查看
+  public void getUserById(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String id = req.getParameter("uid");
+    if(!StringUtils.isNullOrEmpty(id)){
+      //调用后台方法得到user对象
+      UserService userService = new UserServiceImpl();
+      User user = userService.getUserById(id);
+      req.setAttribute("user", user);
+      req.getRequestDispatcher("userview.jsp").forward(req, resp);
+    }
+  }
+  //修改
+
+  //删除
 }

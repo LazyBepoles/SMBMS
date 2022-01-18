@@ -18,5 +18,12 @@ public interface UserService {
     //查询用户列表
     public List<User> getUserList(String queryUserName, int queryUserRole, int currentPageNo, int pageSize);
 
+    //查询用户是否存在
+    public User userCodeExist(String userCode);
 
+    //添加用户
+    public boolean addUser(User user);
+
+    //查看用户
+    public User getUserById(String id);
 }

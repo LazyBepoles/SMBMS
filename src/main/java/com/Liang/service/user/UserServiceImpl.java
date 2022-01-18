@@ -86,4 +86,57 @@ public class UserServiceImpl implements UserService {
         }
         return userList;
     }
+
+    //查询用户是否存在
+    public User userCodeExist(String userCode) {
+        Connection connection = null;
+        User user = null;
+
+        connection = BaseDao.getConnection();
+        //通过业务层调用对应的具体的数据库操作
+        try {
+            user = userDao.getLoginUser(connection, userCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            BaseDao.closeResource(connection, null, null);
+        }
+        return user;
+    }
+
+    //添加用户
+    public boolean addUser(User user) {
+        Connection connection = null;
+        boolean flag = false;
+        //修改密码
+        try {
+            connection = BaseDao.getConnection();
+            if (userDao.addUser(connection, user) > 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection, null, null);
+        }
+        return flag;
+    }
+
+    //查看用户
+
+    public User getUserById(String id) {
+        Connection connection = null;
+        User user = null;
+
+        connection = BaseDao.getConnection();
+        //通过业务层调用对应的具体的数据库操作
+        try {
+            user = userDao.getLoginUser(connection, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            BaseDao.closeResource(connection, null, null);
+        }
+        return user;
+    }
 }

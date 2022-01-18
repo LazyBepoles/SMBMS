@@ -20,5 +20,9 @@ public interface UserDao {
     public List<User> getUserList(Connection connection,String userName,int userRole,int currentPageNo,int pageSize)
         throws Exception;
 
+    //添加用户
+    public int addUser(Connection connection,User user) throws Exception;
 
+    //查看用户
+    public User getUserById(Connection connection,String id) throws Exception;
 }

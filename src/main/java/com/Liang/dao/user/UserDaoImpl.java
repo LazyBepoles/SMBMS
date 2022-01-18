@@ -133,5 +133,53 @@ public class UserDaoImpl implements UserDao {
         return userList;
     }
 
+    //添加用户
+    public int addUser(Connection connection, User user) throws Exception {
+        PreparedStatement ps = null;
+        int execute = 0;
+        if (connection != null) {
+            String sql = "insert into smbms_user (userCode,userName,userPassword," +
+                    "userRole,gender,birthday,phone,address,creationDate,createdBy) " +
+                    "values(?,?,?,?,?,?,?,?,?,?)";
+            Object[] params = {user.getUserCode(),user.getUserName(),user.getUserPassword(),
+                    user.getUserRole(),user.getGender(),user.getBirthday(),
+                    user.getPhone(),user.getAddress(),user.getCreationDate(),user.getCreatedBy()};
+            execute = BaseDao.execute(connection, ps, sql, params);
+            BaseDao.closeResource(null, ps, null);
+        }
+        return execute;
+    }
 
+    //查看用户
+    public User getUserById(Connection connection, String id) throws Exception {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        User user = null;
+
+        if (connection != null) {
+            String sql = "select * from smbms_user where id = ?";
+            Object[] params = {id};
+
+            rs = BaseDao.execute(connection, ps, rs, sql, params);
+
+            if (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUserCode(rs.getString("userCode"));
+                user.setUserName(rs.getString("userName"));
+                user.setUserPassword(rs.getString("userPassword"));
+                user.setGender(rs.getInt("gender"));
+                user.setBirthday(rs.getDate("birthday"));
+                user.setPhone(rs.getString("phone"));
+                user.setAddress(rs.getString("address"));
+                user.setUserRole(rs.getInt("userRole"));
+                user.setCreatedBy(rs.getInt("createdBy"));
+                user.setCreationDate(rs.getTimestamp("creationDate"));
+                user.setModifyBy(rs.getInt("modifyBy"));
+                user.setModifyDate(rs.getTimestamp("modifyDate"));
+            }
+            BaseDao.closeResource(null, ps, rs);
+        }
+        return user;
+    }
 }
