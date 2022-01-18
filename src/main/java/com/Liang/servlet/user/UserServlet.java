@@ -41,9 +41,13 @@ public class UserServlet extends HttpServlet {
     } else if (method.equals("add") && !StringUtils.isNullOrEmpty(method)) {
       this.add(req, resp);
     } else if (method.equals("view") && !StringUtils.isNullOrEmpty(method)) {
-      this.getUserById(req, resp);
+      this.getUserById(req, resp,"userview.jsp");
     } else if (method.equals("deluser") && !StringUtils.isNullOrEmpty(method)) {
       this.delUser(req, resp);
+    } else if(method.equals("modify") && !StringUtils.isNullOrEmpty(method)){
+      this.getUserById(req, resp,"usermodify.jsp");
+    } else if(method.equals("modifyexe") && !StringUtils.isNullOrEmpty(method)){
+      this.modify(req, resp);
     }
   }
 
@@ -54,7 +58,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 修改密码
-  public void updatePwd(HttpServletRequest req, HttpServletResponse resp) {
+  private void updatePwd(HttpServletRequest req, HttpServletResponse resp) {
     // 从sessi获取用户id
     Object user = req.getSession().getAttribute(Constants.USER_SESSION);
     String rnewpassword = req.getParameter("rnewpassword");
@@ -82,7 +86,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 验证旧密码
-  public void pwdModify(HttpServletRequest req, HttpServletResponse resp) {
+  private void pwdModify(HttpServletRequest req, HttpServletResponse resp) {
     Object user = req.getSession().getAttribute(Constants.USER_SESSION);
     String oldpassword = req.getParameter("oldpassword");
 
@@ -113,7 +117,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 用户查询
-  public void query(HttpServletRequest req, HttpServletResponse resp) {
+  private void query(HttpServletRequest req, HttpServletResponse resp) {
     // 查询用户列表
     String queryUserName = req.getParameter("queryname");
     String temp = req.getParameter("queryUserRole");
@@ -184,7 +188,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 判断账号是否存在
-  public void userCodeExist(HttpServletRequest req, HttpServletResponse resp) {
+  private void userCodeExist(HttpServletRequest req, HttpServletResponse resp) {
     String userCode = req.getParameter("userCode");
     // 使用Map存结果集
     Map<String, String> resultMap = new HashMap<String, String>();
@@ -213,7 +217,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 获取角色列表
-  public void getRoleList(HttpServletRequest req, HttpServletResponse resp) {
+  private void getRoleList(HttpServletRequest req, HttpServletResponse resp) {
     RoleService roleService = new RoleServiceImpl();
     List<Role> roleList = roleService.getRoleList();
     try {
@@ -228,7 +232,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 添加用户
-  public void add(HttpServletRequest req, HttpServletResponse resp)
+  private void add(HttpServletRequest req, HttpServletResponse resp)
       throws IOException, ServletException {
     String userCode = req.getParameter("userCode");
     String userName = req.getParameter("userName");
@@ -264,7 +268,7 @@ public class UserServlet extends HttpServlet {
   }
 
   // 查看
-  public void getUserById(HttpServletRequest req, HttpServletResponse resp)
+  private void getUserById(HttpServletRequest req, HttpServletResponse resp,String url)
       throws ServletException, IOException {
     String id = req.getParameter("uid");
     Integer serId = 0;
@@ -278,14 +282,45 @@ public class UserServlet extends HttpServlet {
       UserService userService = new UserServiceImpl();
       User user = userService.getUserById(serId);
       req.setAttribute("user", user);
-      req.getRequestDispatcher("userview.jsp").forward(req, resp);
+      req.getRequestDispatcher(url).forward(req, resp);
       System.out.println(user);
     }
   }
   // 修改
+  private void modify(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    String id = req.getParameter("uid");
+    String userName = req.getParameter("userName");
+    String gender = req.getParameter("gender");
+    String birthday = req.getParameter("birthday");
+    String phone = req.getParameter("phone");
+    String address = req.getParameter("address");
+    String userRole = req.getParameter("userRole");
+
+    User user = new User();
+    user.setId(Integer.valueOf(id));
+    user.setUserName(userName);
+    user.setGender(Integer.valueOf(gender));
+    try {
+      user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(birthday));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    user.setPhone(phone);
+    user.setAddress(address);
+    user.setUserRole(Integer.valueOf(userRole));
+    user.setModifyBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+    user.setModifyDate(new Date());
+
+    UserService userService = new UserServiceImpl();
+    if(userService.modify(user)){
+      resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
+    }else{
+      req.getRequestDispatcher("usermodify.jsp").forward(req, resp);
+    }
+  }
 
   // 删除
-  public void delUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  private void delUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String id = req.getParameter("uid");
     Integer delId = 0;
     try{

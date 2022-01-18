@@ -60,7 +60,7 @@ public class UserDaoImpl implements UserDao {
 
     //查询用户总数
     public int getUserCount(Connection connection, String username, int userRole) throws Exception {
-        PreparedStatement ps = null;
+    PreparedStatement ps = null;
         ResultSet rs = null;
         int count = 0;
 
@@ -191,6 +191,22 @@ public class UserDaoImpl implements UserDao {
         if (connection != null) {
             String sql = "delete from smbms_user where id = ?";
             Object[] params = {id};
+            execute = BaseDao.execute(connection, ps, sql, params);
+            BaseDao.closeResource(null, ps, null);
+        }
+        return execute;
+    }
+
+    //修改用户
+    public int modify(Connection connection, User user) throws Exception {
+        int execute = 0;
+        PreparedStatement ps = null;
+        if(connection != null){
+            String sql = "update smbms_user set userName=?,"+
+                    "gender=?,birthday=?,phone=?,address=?,userRole=?,modifyBy=?,modifyDate=? where id = ? ";
+            Object[] params = {user.getUserName(),user.getGender(),user.getBirthday(),
+                    user.getPhone(),user.getAddress(),user.getUserRole(),user.getModifyBy(),
+                    user.getModifyDate(),user.getId()};
             execute = BaseDao.execute(connection, ps, sql, params);
             BaseDao.closeResource(null, ps, null);
         }

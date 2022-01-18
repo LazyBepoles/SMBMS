@@ -156,4 +156,22 @@ public class UserServiceImpl implements UserService {
         }
         return flag;
     }
+
+    //修改用户
+    public boolean modify(User user) {
+        Connection connection = null;
+        boolean flag = false;
+        //删除用户
+        try {
+            connection = BaseDao.getConnection();
+            if (userDao.modify(connection, user) > 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            BaseDao.closeResource(connection, null, null);
+        }
+        return flag;
+    }
 }
