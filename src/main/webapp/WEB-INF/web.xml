@@ -6,6 +6,16 @@
          version="4.0"
          metadata-complete="true">
 
+    <!--Servlet-->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.Liang.servlet.user.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login.do</url-pattern>
+    </servlet-mapping>
+    
     <!--字符编码过滤器-->
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>
@@ -15,5 +25,9 @@
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
+
+    <!--设置欢迎页面-->
+    <welcome-file-list>
+        <welcome-file>login.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
