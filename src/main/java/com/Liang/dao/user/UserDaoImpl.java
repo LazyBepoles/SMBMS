@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 
 public class UserDaoImpl implements UserDao {
 
+    //得到登录用户
     public User getLoginUser(Connection connection, String userCode) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -40,4 +41,19 @@ public class UserDaoImpl implements UserDao {
         }
         return user;
     }
+
+    //修改当前用户密码
+    public int updatePwd(Connection connection, int id, String password) throws Exception {
+        PreparedStatement ps = null;
+        int execute = 0;
+        if (connection != null) {
+            String sql = "update smbms_user set userPassword = ? where id = ?";
+            Object[] params = {password, id};
+            execute = BaseDao.execute(connection, ps, sql, params);
+            BaseDao.closeResource(null, ps, null);
+        }
+        return execute;
+    }
+
+
 }

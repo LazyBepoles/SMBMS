@@ -28,13 +28,12 @@ public class LoginServlet extends HttpServlet {
         UserService userService = new UserServiceImpl();
         User user = userService.login(userCode, userPassword);
 
-        if (user !=null){//查询到有这个用户
+        if (user != null) {//查询到有这个用户
             //将用户信息写入session;
             req.getSession().setAttribute(Constants.USER_SESSION, user);
             //跳转到主页
             resp.sendRedirect("jsp/frame.jsp");
-        }
-        else{//数据库没有这个用户
+        } else {//数据库没有这个用户
             req.setAttribute("error", "用户名或密码错误");
             req.getRequestDispatcher("login.jsp").forward(req, resp);
         }
