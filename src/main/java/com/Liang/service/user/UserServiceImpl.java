@@ -6,6 +6,7 @@ import com.Liang.dao.user.UserDaoImpl;
 import com.Liang.pojo.User;
 
 import java.sql.Connection;
+import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
@@ -54,5 +55,35 @@ public class UserServiceImpl implements UserService {
             BaseDao.closeResource(connection, null, null);
         }
         return flag;
+    }
+
+    //查询用户数
+    public int getUserCount(String username, int userRole) {
+        Connection connection = null;
+        int userCount = 0;
+        try {
+            connection=BaseDao.getConnection();
+            userCount = userDao.getUserCount(connection, username, userRole);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            BaseDao.closeResource(connection, null, null);
+        }
+        return userCount;
+    }
+
+    //查询用户列表
+    public List<User> getUserList(String queryUserName, int queryUserRole, int currentPageNo, int pageSize) {
+        Connection connection = null;
+        List<User> userList = null;
+        try {
+            connection = BaseDao.getConnection();
+            userList = userDao.getUserList(connection, queryUserName,queryUserRole,currentPageNo,pageSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            BaseDao.closeResource(connection, null, null);
+        }
+        return userList;
     }
 }
