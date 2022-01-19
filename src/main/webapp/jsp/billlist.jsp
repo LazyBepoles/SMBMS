@@ -32,6 +32,7 @@
                 <option value="2" ${queryIsPayment == 2 ? "selected=\"selected\"":"" }>已付款</option>
             </select>
 
+            <input type="hidden" name="pageIndex" value="1"/>
             <input value="查 询" type="submit" id="searchbutton">
             <a href="${pageContext.request.contextPath }/jsp/billadd.jsp">添加订单</a>
         </form>
@@ -84,7 +85,7 @@
         </c:forEach>
     </table>
     <input type="hidden" id="totalPageCount" value="${totalPageCount}"/>
-    <c:import url="common/rollpage.jsp">
+    <c:import url="rollpage.jsp">
         <c:param name="totalCount" value="${totalCount}"/>
         <c:param name="currentPageNo" value="${currentPageNo}"/>
         <c:param name="totalPageCount" value="${totalPageCount}"/>

@@ -16,6 +16,7 @@
             <span>供应商名称：</span>
             <input name="queryProName" type="text" value="${queryProName }">
 
+            <input type="hidden" name="pageIndex" value="1"/>
             <input value="查 询" type="submit" id="searchbutton">
             <a href="${pageContext.request.contextPath }/jsp/provideradd.jsp">添加供应商</a>
         </form>
@@ -68,7 +69,7 @@
         </c:forEach>
     </table>
     <input type="hidden" id="totalPageCount" value="${totalPageCount}"/>
-    <c:import url="common/rollpage.jsp">
+    <c:import url="rollpage.jsp">
         <c:param name="totalCount" value="${totalCount}"/>
         <c:param name="currentPageNo" value="${currentPageNo}"/>
         <c:param name="totalPageCount" value="${totalPageCount}"/>
