@@ -17,8 +17,8 @@ $(function () {
         $.ajax({
             type: "GET",
             url: path + "/jsp/user.do",
-            data: {method:"pwdmodify",oldpassword:oldpassword.val()},
-            dataType:"json",
+            data: {method: "pwdmodify", oldpassword: oldpassword.val()},
+            dataType: "json",
             success: function (data) {
                 if (data.result == "true") {//旧密码正确
                     validateTip(oldpassword.next(), {"color": "green"}, imgYes, true);

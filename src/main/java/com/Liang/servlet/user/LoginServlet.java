@@ -13,34 +13,36 @@ import java.io.IOException;
 
 public class LoginServlet extends HttpServlet {
 
-    //Servlet控制层，调用业务层代码
+  // Servlet控制层，调用业务层代码
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
 
-        System.out.println("Into LoginServlet");
+    System.out.println("Into LoginServlet");
 
-        //获取表单用户名和密码
-        String userCode = req.getParameter("userCode");
-        String userPassword = req.getParameter("userPassword");
+    // 获取表单用户名和密码
+    String userCode = req.getParameter("userCode");
+    String userPassword = req.getParameter("userPassword");
 
-        //调用业务层，和数据库密码比对
-        UserService userService = new UserServiceImpl();
-        User user = userService.login(userCode, userPassword);
+    // 调用业务层，和数据库密码比对
+    UserService userService = new UserServiceImpl();
+    User user = userService.login(userCode, userPassword);
 
-        if (user != null) {//查询到有这个用户
-            //将用户信息写入session;
-            req.getSession().setAttribute(Constants.USER_SESSION, user);
-            //跳转到主页
-            resp.sendRedirect("jsp/frame.jsp");
-        } else {//数据库没有这个用户
-            req.setAttribute("error", "用户名或密码错误");
-            req.getRequestDispatcher("login.jsp").forward(req, resp);
-        }
+    if (user != null) { // 查询到有这个用户
+      // 将用户信息写入session;
+      req.getSession().setAttribute(Constants.USER_SESSION, user);
+      // 跳转到主页
+      resp.sendRedirect("jsp/frame.jsp");
+    } else { // 数据库没有这个用户
+      req.setAttribute("error", "用户名或密码错误");
+      req.getRequestDispatcher("login.jsp").forward(req, resp);
     }
+  }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
-    }
+  @Override
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    doGet(req, resp);
+  }
 }

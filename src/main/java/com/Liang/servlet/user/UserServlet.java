@@ -41,12 +41,12 @@ public class UserServlet extends HttpServlet {
     } else if (method.equals("add") && !StringUtils.isNullOrEmpty(method)) {
       this.add(req, resp);
     } else if (method.equals("view") && !StringUtils.isNullOrEmpty(method)) {
-      this.getUserById(req, resp,"userview.jsp");
+      this.getUserById(req, resp, "userview.jsp");
     } else if (method.equals("deluser") && !StringUtils.isNullOrEmpty(method)) {
       this.delUser(req, resp);
-    } else if(method.equals("modify") && !StringUtils.isNullOrEmpty(method)){
-      this.getUserById(req, resp,"usermodify.jsp");
-    } else if(method.equals("modifyexe") && !StringUtils.isNullOrEmpty(method)){
+    } else if (method.equals("modify") && !StringUtils.isNullOrEmpty(method)) {
+      this.getUserById(req, resp, "usermodify.jsp");
+    } else if (method.equals("modifyexe") && !StringUtils.isNullOrEmpty(method)) {
       this.modify(req, resp);
     }
   }
@@ -268,13 +268,13 @@ public class UserServlet extends HttpServlet {
   }
 
   // 查看
-  private void getUserById(HttpServletRequest req, HttpServletResponse resp,String url)
+  private void getUserById(HttpServletRequest req, HttpServletResponse resp, String url)
       throws ServletException, IOException {
     String id = req.getParameter("uid");
     Integer serId = 0;
-    try{
+    try {
       serId = Integer.parseInt(id);
-    }catch (Exception e) {
+    } catch (Exception e) {
       serId = 0;
     }
     if (serId > 0) {
@@ -287,7 +287,8 @@ public class UserServlet extends HttpServlet {
     }
   }
   // 修改
-  private void modify(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+  private void modify(HttpServletRequest req, HttpServletResponse resp)
+      throws IOException, ServletException {
     String id = req.getParameter("uid");
     String userName = req.getParameter("userName");
     String gender = req.getParameter("gender");
@@ -308,13 +309,13 @@ public class UserServlet extends HttpServlet {
     user.setPhone(phone);
     user.setAddress(address);
     user.setUserRole(Integer.valueOf(userRole));
-    user.setModifyBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+    user.setModifyBy(((User) req.getSession().getAttribute(Constants.USER_SESSION)).getId());
     user.setModifyDate(new Date());
 
     UserService userService = new UserServiceImpl();
-    if(userService.modify(user)){
-      resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
-    }else{
+    if (userService.modify(user)) {
+      resp.sendRedirect(req.getContextPath() + "/jsp/user.do?method=query");
+    } else {
       req.getRequestDispatcher("usermodify.jsp").forward(req, resp);
     }
   }
@@ -323,23 +324,23 @@ public class UserServlet extends HttpServlet {
   private void delUser(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     String id = req.getParameter("uid");
     Integer delId = 0;
-    try{
+    try {
       delId = Integer.parseInt(id);
-    }catch (Exception e) {
+    } catch (Exception e) {
       delId = 0;
     }
     HashMap<String, String> resultMap = new HashMap<String, String>();
-    if(delId <= 0){
+    if (delId <= 0) {
       resultMap.put("delResult", "notexist");
-    }else{
+    } else {
       UserService userService = new UserServiceImpl();
-      if(userService.delUserBy(delId)){
+      if (userService.delUserBy(delId)) {
         resultMap.put("delResult", "true");
-      }else{
+      } else {
         resultMap.put("delResult", "false");
       }
     }
-    //把resultMap转换成json对象输出
+    // 把resultMap转换成json对象输出
     resp.setContentType("application/json");
     PrintWriter outPrintWriter = resp.getWriter();
     outPrintWriter.write(JSONArray.toJSONString(resultMap));

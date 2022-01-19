@@ -10,8 +10,12 @@ public interface BillDao {
   // 添加订单
   int add(Connection connection, Bill bill) throws Exception;
 
+  // 查询订单总数
+  int getBillCount(Connection connection, Bill bill) throws Exception;
+
   // 通过查询条件获取供应商列表-模糊查询-getBillList
-  List<Bill> getBillList(Connection connection, Bill bill) throws Exception;
+  List<Bill> getBillList(Connection connection, Bill bill, int currentPageNo, int pageSize)
+      throws Exception;
 
   // 通过delId删除Bill
   int deleteBillById(Connection connection, String delId) throws Exception;

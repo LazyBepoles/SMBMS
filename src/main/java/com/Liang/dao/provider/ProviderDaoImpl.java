@@ -10,116 +10,212 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProviderDaoImpl implements ProviderDao{
+public class ProviderDaoImpl implements ProviderDao {
 
-    // 增加供应商
-    public int add(Connection connection, Provider provider) throws Exception {
-        PreparedStatement ps = null;
-        int execute = 0;
-        if(connection != null){
-            String sql = "insert into smbms_provider (proCode,proName,proDesc," +
-                    "proContact,proPhone,proAddress,proFax,createdBy,creationDate) " +
-                    "values(?,?,?,?,?,?,?,?,?)";
-            Object[] params = {provider.getProCode(),provider.getProName(),provider.getProDesc(),
-                    provider.getProContact(),provider.getProPhone(),provider.getProAddress(),
-                    provider.getProFax(),provider.getCreatedBy(),provider.getCreationDate()};
-            execute = BaseDao.execute(connection, ps, sql, params);
-            BaseDao.closeResource(null, ps, null);
-        }
-        return execute;
+  // 增加供应商
+  public int add(Connection connection, Provider provider) throws Exception {
+    PreparedStatement ps = null;
+    int execute = 0;
+    if (connection != null) {
+      String sql =
+          "insert into smbms_provider (proCode,proName,proDesc,"
+              + "proContact,proPhone,proAddress,proFax,createdBy,creationDate) "
+              + "values(?,?,?,?,?,?,?,?,?)";
+      Object[] params = {
+        provider.getProCode(),
+        provider.getProName(),
+        provider.getProDesc(),
+        provider.getProContact(),
+        provider.getProPhone(),
+        provider.getProAddress(),
+        provider.getProFax(),
+        provider.getCreatedBy(),
+        provider.getCreationDate()
+      };
+      execute = BaseDao.execute(connection, ps, sql, params);
+      BaseDao.closeResource(null, ps, null);
     }
+    return execute;
+  }
 
-    // 通过供应商名称、编码获取供应商列表-模糊查询-providerList
-    public List<Provider> getProviderList(Connection connection, String proName, String proCode) throws Exception {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        List<Provider> providerList = new ArrayList<Provider>();
-        if(connection != null){
-            StringBuffer sql = new StringBuffer();
-            sql.append("select * from smbms_provider where 1=1 ");
-            List<Object> list = new ArrayList<Object>();
-            if(!StringUtils.isNullOrEmpty(proName)){
-                sql.append(" and proName like ?");
-                list.add("%"+proName+"%");
-            }
-            if(!StringUtils.isNullOrEmpty(proCode)){
-                sql.append(" and proCode like ?");
-                list.add("%"+proCode+"%");
-            }
-            Object[] params = list.toArray();
-            rs = BaseDao.execute(connection, ps, rs, sql.toString(), params);
-            while(rs.next()){
-                Provider _provider = new Provider();
-                _provider.setId(rs.getInt("id"));
-                _provider.setProCode(rs.getString("proCode"));
-                _provider.setProName(rs.getString("proName"));
-                _provider.setProDesc(rs.getString("proDesc"));
-                _provider.setProContact(rs.getString("proContact"));
-                _provider.setProPhone(rs.getString("proPhone"));
-                _provider.setProAddress(rs.getString("proAddress"));
-                _provider.setProFax(rs.getString("proFax"));
-                _provider.setCreationDate(rs.getTimestamp("creationDate"));
-                providerList.add(_provider);
-            }
-            BaseDao.closeResource(null, ps, rs);
-        }
-        return providerList;
-    }
+  // 查询供应商总数
+  public int getProviderCount(Connection connection, String proName, String proCode)
+      throws Exception {
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    int count = 0;
 
-    // 通过proId删除Provider
-    public int deleteProviderById(Connection connection, String delId) throws Exception {
-        PreparedStatement ps = null;
-        int execute = 0;
-        if(connection != null){
-            String sql = "delete from smbms_provider where id=?";
-            Object[] params = {delId};
-            execute = BaseDao.execute(connection, ps, sql, params);
-            BaseDao.closeResource(null, ps, null);
-        }
-        return execute;
+    if (connection != null) {
+      StringBuffer sql = new StringBuffer();
+      sql.append("select count(1) as count from smbms_provider where 1=1 ");
+      List<Object> list = new ArrayList<Object>();
+      if (!StringUtils.isNullOrEmpty(proName)) {
+        sql.append(" and proName like ?");
+        list.add("%" + proName + "%");
+      }
+      if (!StringUtils.isNullOrEmpty(proCode)) {
+        sql.append(" and proCode like ?");
+        list.add("%" + proCode + "%");
+      }
+      Object[] params = list.toArray();
+      rs = BaseDao.execute(connection, ps, rs, sql.toString(), params);
+      if (rs.next()) {
+        count = rs.getInt("count");
+      }
+      BaseDao.closeResource(null, ps, rs);
     }
+    return count;
+  }
+  // 通过供应商名称、编码获取供应商列表-模糊查询-providerList
+  public List<Provider> getProviderList(
+      Connection connection, String proName, String proCode, int currentPageNo, int pageSize)
+      throws Exception {
 
-    // 通过proId获取Provider
-    public Provider getProviderById(Connection connection, String id) throws Exception {
-        Provider provider = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        if(connection != null){
-            String sql = "select * from smbms_provider where id=?";
-            Object[] params = {id};
-            rs = BaseDao.execute(connection, ps, rs, sql, params);
-            if(rs.next()){
-                provider = new Provider();
-                provider.setId(rs.getInt("id"));
-                provider.setProCode(rs.getString("proCode"));
-                provider.setProName(rs.getString("proName"));
-                provider.setProDesc(rs.getString("proDesc"));
-                provider.setProContact(rs.getString("proContact"));
-                provider.setProPhone(rs.getString("proPhone"));
-                provider.setProAddress(rs.getString("proAddress"));
-                provider.setProFax(rs.getString("proFax"));
-                provider.setCreatedBy(rs.getInt("createdBy"));
-                provider.setCreationDate(rs.getTimestamp("creationDate"));
-                provider.setModifyBy(rs.getInt("modifyBy"));
-                provider.setModifyDate(rs.getTimestamp("modifyDate"));
-            }
-            BaseDao.closeResource(null, ps, rs);
-        }
-        return provider;
-    }
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    List<Provider> providerList = new ArrayList<Provider>();
 
-    // 修改用户信息
-    public int modify(Connection connection, Provider provider) throws Exception {
-        int execute = 0;
-        PreparedStatement ps = null;
-        if(null != connection){
-            String sql = "update smbms_provider set proName=?,proDesc=?,proContact=?," +
-                    "proPhone=?,proAddress=?,proFax=?,modifyBy=?,modifyDate=? where id = ? ";
-            Object[] params = {provider.getProName(),provider.getProDesc(),provider.getProContact(),provider.getProPhone(),provider.getProAddress(),
-                    provider.getProFax(),provider.getModifyBy(),provider.getModifyDate(),provider.getId()};
-            execute = BaseDao.execute(connection, ps, sql, params);
-            BaseDao.closeResource(null, ps, null);
-        }
-        return execute;
+    if (connection != null) {
+      StringBuffer sql = new StringBuffer();
+      sql.append("select * from smbms_provider where 1=1 ");
+      List<Object> list = new ArrayList<Object>();
+      if (!StringUtils.isNullOrEmpty(proName)) {
+        sql.append(" and proName like ?");
+        list.add("%" + proName + "%");
+      }
+      if (!StringUtils.isNullOrEmpty(proCode)) {
+        sql.append(" and proCode like ?");
+        list.add("%" + proCode + "%");
+      }
+      sql.append(" order by creationDate DESC limit ?,?");
+      currentPageNo = (currentPageNo - 1) * pageSize;
+      list.add(currentPageNo);
+      list.add(pageSize);
+
+      Object[] params = list.toArray();
+      rs = BaseDao.execute(connection, ps, rs, sql.toString(), params);
+      while (rs.next()) {
+        Provider _provider = new Provider();
+        _provider.setId(rs.getInt("id"));
+        _provider.setProCode(rs.getString("proCode"));
+        _provider.setProName(rs.getString("proName"));
+        _provider.setProDesc(rs.getString("proDesc"));
+        _provider.setProContact(rs.getString("proContact"));
+        _provider.setProPhone(rs.getString("proPhone"));
+        _provider.setProAddress(rs.getString("proAddress"));
+        _provider.setProFax(rs.getString("proFax"));
+        _provider.setCreationDate(rs.getTimestamp("creationDate"));
+        providerList.add(_provider);
+      }
+      BaseDao.closeResource(null, ps, rs);
     }
+    return providerList;
+  }
+
+  public List<Provider> getProviderListforBill(
+      Connection connection, String proName, String proCode) throws Exception {
+
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    List<Provider> providerList = new ArrayList<Provider>();
+
+    if (connection != null) {
+      StringBuffer sql = new StringBuffer();
+      sql.append("select * from smbms_provider where 1=1 ");
+      List<Object> list = new ArrayList<Object>();
+      if (!StringUtils.isNullOrEmpty(proName)) {
+        sql.append(" and proName like ?");
+        list.add("%" + proName + "%");
+      }
+      if (!StringUtils.isNullOrEmpty(proCode)) {
+        sql.append(" and proCode like ?");
+        list.add("%" + proCode + "%");
+      }
+
+      Object[] params = list.toArray();
+      rs = BaseDao.execute(connection, ps, rs, sql.toString(), params);
+      while (rs.next()) {
+        Provider _provider = new Provider();
+        _provider.setId(rs.getInt("id"));
+        _provider.setProCode(rs.getString("proCode"));
+        _provider.setProName(rs.getString("proName"));
+        _provider.setProDesc(rs.getString("proDesc"));
+        _provider.setProContact(rs.getString("proContact"));
+        _provider.setProPhone(rs.getString("proPhone"));
+        _provider.setProAddress(rs.getString("proAddress"));
+        _provider.setProFax(rs.getString("proFax"));
+        _provider.setCreationDate(rs.getTimestamp("creationDate"));
+        providerList.add(_provider);
+      }
+      BaseDao.closeResource(null, ps, rs);
+    }
+    return providerList;
+  }
+
+  // 通过proId删除Provider
+  public int deleteProviderById(Connection connection, String delId) throws Exception {
+    PreparedStatement ps = null;
+    int execute = 0;
+    if (connection != null) {
+      String sql = "delete from smbms_provider where id=?";
+      Object[] params = {delId};
+      execute = BaseDao.execute(connection, ps, sql, params);
+      BaseDao.closeResource(null, ps, null);
+    }
+    return execute;
+  }
+
+  // 通过proId获取Provider
+  public Provider getProviderById(Connection connection, String id) throws Exception {
+    Provider provider = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    if (connection != null) {
+      String sql = "select * from smbms_provider where id=?";
+      Object[] params = {id};
+      rs = BaseDao.execute(connection, ps, rs, sql, params);
+      if (rs.next()) {
+        provider = new Provider();
+        provider.setId(rs.getInt("id"));
+        provider.setProCode(rs.getString("proCode"));
+        provider.setProName(rs.getString("proName"));
+        provider.setProDesc(rs.getString("proDesc"));
+        provider.setProContact(rs.getString("proContact"));
+        provider.setProPhone(rs.getString("proPhone"));
+        provider.setProAddress(rs.getString("proAddress"));
+        provider.setProFax(rs.getString("proFax"));
+        provider.setCreatedBy(rs.getInt("createdBy"));
+        provider.setCreationDate(rs.getTimestamp("creationDate"));
+        provider.setModifyBy(rs.getInt("modifyBy"));
+        provider.setModifyDate(rs.getTimestamp("modifyDate"));
+      }
+      BaseDao.closeResource(null, ps, rs);
+    }
+    return provider;
+  }
+
+  // 修改用户信息
+  public int modify(Connection connection, Provider provider) throws Exception {
+    int execute = 0;
+    PreparedStatement ps = null;
+    if (null != connection) {
+      String sql =
+          "update smbms_provider set proName=?,proDesc=?,proContact=?,"
+              + "proPhone=?,proAddress=?,proFax=?,modifyBy=?,modifyDate=? where id = ? ";
+      Object[] params = {
+        provider.getProName(),
+        provider.getProDesc(),
+        provider.getProContact(),
+        provider.getProPhone(),
+        provider.getProAddress(),
+        provider.getProFax(),
+        provider.getModifyBy(),
+        provider.getModifyDate(),
+        provider.getId()
+      };
+      execute = BaseDao.execute(connection, ps, sql, params);
+      BaseDao.closeResource(null, ps, null);
+    }
+    return execute;
+  }
 }

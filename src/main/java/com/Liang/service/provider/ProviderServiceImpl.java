@@ -43,14 +43,47 @@ public class ProviderServiceImpl implements ProviderService {
     return flag;
   }
 
+  // 查询供应商总数
+  public int getProviderCount(String proName, String proCode) {
+    Connection connection = null;
+    List<Provider> providerList = null;
+    int count = 0;
+    try {
+      connection = BaseDao.getConnection();
+      count = providerDao.getProviderCount(connection, proName, proCode);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      BaseDao.closeResource(connection, null, null);
+    }
+    return count;
+  }
+
   // 通过供应商名称、编码获取供应商列表-模糊查询-providerList
-  public List<Provider> getProviderList(String proName, String proCode) {
+  public List<Provider> getProviderList(
+      String proName, String proCode, int currentPageNo, int pageSize) {
     Connection connection = null;
     List<Provider> providerList = null;
 
     try {
       connection = BaseDao.getConnection();
-      providerList = providerDao.getProviderList(connection, proName, proCode);
+      providerList =
+          providerDao.getProviderList(connection, proName, proCode, currentPageNo, pageSize);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      BaseDao.closeResource(connection, null, null);
+    }
+    return providerList;
+  }
+
+  public List<Provider> getProviderListforBill(String proName, String proCode) {
+    Connection connection = null;
+    List<Provider> providerList = null;
+
+    try {
+      connection = BaseDao.getConnection();
+      providerList = providerDao.getProviderListforBill(connection, proName, proCode);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -66,8 +99,8 @@ public class ProviderServiceImpl implements ProviderService {
     try {
       connection = BaseDao.getConnection();
       connection.setAutoCommit(false);
-      billCount = billDao.getBillCountByProviderId(connection,delId);
-      if(billCount == 0){
+      billCount = billDao.getBillCountByProviderId(connection, delId);
+      if (billCount == 0) {
         providerDao.deleteProviderById(connection, delId);
       }
       connection.commit();
@@ -79,7 +112,7 @@ public class ProviderServiceImpl implements ProviderService {
       } catch (SQLException e1) {
         e1.printStackTrace();
       }
-    }finally{
+    } finally {
       BaseDao.closeResource(connection, null, null);
     }
     return billCount;
@@ -89,13 +122,13 @@ public class ProviderServiceImpl implements ProviderService {
   public Provider getProviderById(String id) {
     Provider provider = null;
     Connection connection = null;
-    try{
+    try {
       connection = BaseDao.getConnection();
       provider = providerDao.getProviderById(connection, id);
-    }catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       provider = null;
-    }finally{
+    } finally {
       BaseDao.closeResource(connection, null, null);
     }
     return provider;
@@ -107,11 +140,10 @@ public class ProviderServiceImpl implements ProviderService {
     boolean flag = false;
     try {
       connection = BaseDao.getConnection();
-      if(providerDao.modify(connection,provider) > 0)
-        flag = true;
+      if (providerDao.modify(connection, provider) > 0) flag = true;
     } catch (Exception e) {
       e.printStackTrace();
-    }finally{
+    } finally {
       BaseDao.closeResource(connection, null, null);
     }
     return flag;
